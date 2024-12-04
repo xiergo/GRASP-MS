@@ -51,21 +51,16 @@ from restraint_sample import generate_interface_and_restraints
 
 print(datetime.datetime.now(), 'Start now!')
 
-parser = argparse.ArgumentParser(description='Inputs for eval.py')
+parser = argparse.ArgumentParser(description='Inputs for main.py')
 parser.add_argument('--train_url', required=False, default="/job/output/", help='Location of training output')
 parser.add_argument('--data_url', required=False, default="/job/dataset/", help='Location of data')
-parser.add_argument('--data_config', default="/job/file/config/multimer-data.yaml", help='data process config')
-parser.add_argument('--model_config', default="/job/file/config/multimer-model.yaml", help='model config')
-parser.add_argument('--input_path', default="./examples/pkl/", help='processed raw feature path')
-parser.add_argument('--pdb_path', default="./examples/pdb/", type=str, help='Location of training pdb file.')
-parser.add_argument('--use_pkl', type=ast.literal_eval, default=True,
-                    help="use pkl as input or fasta file as input, in default use fasta")
-parser.add_argument('--checkpoint_path',type=str, default='jax_ckpt/converted_ms_ckpts/params_model_1_multimer_v3_ms.ckpt',  help='checkpoint path')
-parser.add_argument('--device_id', default=0, type=int, help='DEVICE_ID')
+parser.add_argument('--checkpoint_path',type=str, default='jax_ckpt/converted_ms_ckpts/params_model_1_multimer_v3_ms.ckpt',  help='the checkpoint path from which to continue training or fine-tuning. If not provided, the model will be trained from scratch.')
+# parser.add_argument('--data_config', default="/job/file/config/multimer-data.yaml", help='data process config')
+# parser.add_argument('--model_config', default="/job/file/config/multimer-model.yaml", help='model config')
+# parser.add_argument('--device_id', default=0, type=int, help='DEVICE_ID')
+# parser.add_argument('--run_platform', default='Ascend', type=str, help='which platform to use, Ascend or GPU')
 parser.add_argument('--is_training', type=ast.literal_eval, default=True, help='is training or not')
-parser.add_argument('--run_platform', default='Ascend', type=str, help='which platform to use, Ascend or GPU')
 parser.add_argument('--run_distribute', type=ast.literal_eval, default=True, help='run distribute')
-parser.add_argument('--resolution_data', type=str, default=None, help='Location of resolution data file.')
 parser.add_argument('--loss_scale', type=float, default=1024.0, help='loss scale')
 parser.add_argument('--lr_max', type=float, default=0.0001, help='lr_max')
 parser.add_argument('--gradient_clip', type=float, default=1.0, help='gradient clip value')
@@ -75,7 +70,7 @@ parser.add_argument('--extra_evonum', type=int, default=4, help='extra evoformer
 parser.add_argument('--evonum', type=int, default=48, help='evoformer num') #48
 parser.add_argument('--struct_recycle', type=int, default=8 , help='structure module num') # 8
 parser.add_argument('--save_ckpt_path', type=str, required=True, help='save_ckpt_path')
-parser.add_argument('--fix_afm', type=ast.literal_eval, default=False, help='fix parameters of AFM part')
+parser.add_argument('--fix_afm', type=ast.literal_eval, default=False, help='fix parameters of AFM part or not')
 parser.add_argument('--hard_rate', type=float, default=0.0, help='hard target rate')
 parser.add_argument('--high', type=int, default=25, help='upper bound for number of msa in hard case')
 parser.add_argument('--megafold', type=int, default=0, help='is megafold')
@@ -182,13 +177,15 @@ def make_name_list(total_steps, start_step, seed=0, single_ratio=0.2):
     return random_names_all, resolution_data
 
 def main(args):
-    data_cfg = load_config(args.data_config)
+    # data_cfg = load_config(args.data_config)
+    data_cfg = load_config(f"./config/multimer-data.yaml")
     data_cfg.common.max_extra_msa = 1024
     data_cfg.common.max_msa_clusters = 256
     data_cfg.common.crop_size = 384
     
 
-    model_cfg = load_config(args.model_config)
+    # model_cfg = load_config(args.model_config)
+    model_cfg = load_config(f"./config/multimer-model.yaml")
     model_cfg.is_training = True
     model_cfg.seq_length = data_cfg.common.crop_size
 

@@ -1,12 +1,10 @@
 ![header](imgs/header.png)
 
-# GRASP-MS: Accurate Protein Complex Structure Prediction with MindSpore
+# GRASP-MS: Accurate Protein Complex Structure Prediction Assisted by Experimental Restraints (MindSpore version)
 
 Our tool provides accurate protein complex structure prediction, flexibly integrated with diverse experimental restraints, using MindSpore. 
 To facilitate the inference of our tool on GPU-accelerated platforms, we provide a JAX-based implementation of the GRASP algorithm, which is available in [GRASP-JAX](https://github.com/xiergo/GRASP-JAX).
 
-
-The training dataset can be downloaded from the following link: [PSP dataset](http://ftp.cbi.pku.edu.cn/pub/psp/).
 
 ## Installation
 
@@ -15,8 +13,8 @@ To install GRASP-JAX, follow these steps:
 1. Clone the repository and navigate into it.
 
    ```bash
-   git clone https://github.com/xiergo/GRASP_JAX.git
-   cd ./GRASP_JAX
+   git clone https://github.com/xiergo/GRASP_MS.git
+   cd ./GRASP_MS
    ```
 
 2. Download the necessary genetic database as described in [AlphaFold](https://github.com/google-deepmind/alphafold). Additionally, download the GRASP model weights from [this link](https://osf.io/6kjuq/) and move them to the directory where you stored the AlphaFold genetic database:
@@ -34,8 +32,27 @@ To install GRASP-JAX, follow these steps:
    conda activate GRASP
    ```
   The installation takes ~10 minutes.
-  
-## Prepare restraints file
+
+## Training
+
+To train GRASP-MS, follow these steps:
+
+* Prepare the training dataset. The training dataset can be downloaded from the following link: [PSP dataset](http://ftp.cbi.pku.edu.cn/pub/psp/).
+* Training the GRASP model:
+
+   ```bash
+   python main.py \
+       --train_url PATH_TO_TRAINING_OUTPUT_DIR \
+       --data_url PATH_TO_PSP_DATASET \
+       --checkpoint_path PATH_TO_INITIAL_CHECKPOINT
+   ```
+
+   The `train_url` is the directory where the training output will be stored, `data_url` is the directory where the PSP dataset is stored, and `checkpoint_path` is the path to the initial checkpoint. If not specified, the model will be trained from scratch. Type `python main.py -h` to see all other arguments specified to customize the training process.
+
+
+## Inference
+
+### Prepare restraints file
 
 We use a dictionary to store restraint information for GRASP inference, which consists of three key components: `sbr`, `sbr_mask`, and `interface_mask`. The `interface_mask` is an array of shape (`N_residues`,), where `1` marks interface residues and `0` indicates the absence of relevant information. Here, `N_residues` stands for the total number of residues in the protein complex. The `sbr` is an array of shape (`N_residues`, `N_residues`, `N_bins`), where `N_bins` represents the number of distance bins used for the restraints, and it holds the distogram of the restraints between residue pairs. Finally, the `sbr_mask` is an array of shape (`N_residues`, `N_residues`), where `1` signifies a restraint between a pair of residues and `0` means no restraint exists.
 
@@ -54,9 +71,9 @@ optional arguments:
 ```
 To generate a `.pkl` file for GRASP inference, you need to provide two key files: a restraints file and a FASTA file.
 
-### Restraints File Format
+#### Restraints File Format
 Each line of the restraints file contains one restraint, structured as follows:
-#### RPR restraint:
+##### RPR restraint:
 Each line should contain two residues, the distance cutoff, and optionally, the false discovery rate (FDR). The format is: 
 
 `residue1, residue2, distance_cutoff[, fdr]`
@@ -72,14 +89,14 @@ Here, `residue1` and `residue2` are formatted as `chain_index-residue_index-resi
 Example: "1-10-G" represents the 10th residue in the first chain, and the residue is Glycine (G).
 The `distance_cutoff` specifies the maximum allowed distance between the two residues, and the `fdr` (optional, defaulting to 0.05) represents the false discovery rate for the RPR restraint.
 
-#### IR Restraint:
+##### IR Restraint:
 For interface restraints (IR), the format is simpler:
 
 `residue`
 
 The residue is also specified in the same format as above: `chain_index-residue_index-residue_type`.
 
-### Example of a Restraints File:
+#### Example of a Restraints File:
 ```
 1-10-G, 1-20-A, 8.0, 0.05
 1-15-L
@@ -88,9 +105,8 @@ In this example, the first line represents an RPR restraint between the 10th Gly
 
 The FASTA file contains the sequence of the protein complex. And it should be the one utilized for searching through the genetic database.
 
-## Inference
 
-### Arguments
+### Inference Arguments
 To perform inference using GRASP, you must first prepare a feature dictionary utilizing AlphaFold-multimer's protocol. Alternatively, you can specify the required arguments to generate the feature dictionary. Below are some unique arguments specifically for GRASP inference:
 ```bash
 run_grasp.py:
