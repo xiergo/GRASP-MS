@@ -1,0 +1,1 @@
+All the scripts in this folder are used for batch inference of cases in the paper. Their original location is in the root folder, and they are moved from the root folder to this folder for better organization.
