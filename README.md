@@ -2,8 +2,7 @@
 
 # GRASP-MS: Accurate Protein Complex Structure Prediction Assisted by Experimental Restraints (MindSpore version)
 
-Our tool provides accurate protein complex structure prediction, flexibly integrated with diverse experimental restraints. The training and inference is based on MindSpore, and Ascend platform.  
-To facilitate the inference of our tool on GPU-accelerated platforms, we provide a JAX-based implementation of the GRASP algorithm, which is available in [GRASP-JAX](https://github.com/xiergo/GRASP-JAX).
+Our tool provides accurate protein complex structure prediction, flexibly integrated with diverse experimental restraints. The model is implemented using MindSpore, and can be trained and infered on the Ascend platform. To facilitate the inference of our tool on GPU-accelerated platforms, we also provide a JAX-based implementation of the GRASP algorithm, which is available in [GRASP-JAX](https://github.com/xiergo/GRASP-JAX).
 
 
 ## Installation
@@ -138,7 +137,7 @@ python inference.py \
 ```
 
 
-## Outputs
+### Outputs
 
    The output directory will include following files:
 
