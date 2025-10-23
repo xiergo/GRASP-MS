@@ -170,8 +170,7 @@ python inference.py \
 
 ## Citations
 If you use this package, please cite as the following:
-```python
-
+```bibtex
 @Article{GRASP,
   author  = {Yuhao Xie, Chengwei Zhang, Shimian Li, Xinyu Du, Yanjiao Lu, Min Wang, Yingtong Hu, Zhenyu Chen, Sirui Liu, Yi Qin Gao},
   journal = {Nature Methods},
@@ -179,3 +178,4 @@ If you use this package, please cite as the following:
   year    = {2025},
   doi     = {10.1038/s41592-025-02820-1}
 }
+```
